@@ -49,17 +49,31 @@ class App extends React.Component {
     unsignedSeed: "I'm generating my KeySpace PGP key encryption password"
   };
   componentDidMount(){
-    window.web3.eth.getAccounts((err, accounts) => {
+    window.web3 && window.web3.eth.getAccounts((err, accounts) => {
       const [address] = accounts
       if(address && getSignedSeedForAddress(address.toLowerCase())) {
         this.init()
       }
     })
   }
-  async init() {
-    await window.ethereum.enable();
-    this.setState({ stage: 'web3Enabled' })
-    signer = getSigner()
+  async init(type = 'metamask') {
+
+    if(type === 'metamask') {
+      try {
+        await window.ethereum.enable();
+      } catch (e) {
+        this.setState({
+          stage: 'keyspaceInitializationError',
+          initializationError: 'Web3 not detected'
+        })
+        return
+      }
+      this.setState({stage: 'web3Enabled'})
+      signer = getSigner()
+    } else if(type === 'newWallet') {
+      this.setState({stage: 'web3Enabled'})
+      signer = ethers.Wallet.createRandom()
+    }
     const walletAddress = (await signer.getAddress()).toLowerCase();
     this.setState({ walletAddress })
     const signedSeed = getSignedSeedForAddress(walletAddress);
@@ -143,7 +157,11 @@ class App extends React.Component {
     const { stage, initializationError, walletAddress } = this.state
     let content
     if(stage === 'initial') {
-      content = <AuthButton onClick={() => this.init()} label="Connect To Metamask" />
+      content = <Box direction="row">
+        <AuthButton margin="small" onClick={() => this.init('newWallet')} label="Generate New Wallet" />
+
+        <AuthButton margin="small" onClick={() => this.init('metamask')} label="Connect To Metamask" />
+      </Box>
     }
     if (stage === 'web3Enabled') {
       content = <Text>Initializing KeySpace</Text>

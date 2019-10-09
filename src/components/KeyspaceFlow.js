@@ -16,8 +16,10 @@ const messageToSign = "test meeeee";
 
 const MessengerHoldScreen = () => <Paragraph>Initialize Keyspace to use IPFS pubsub chat</Paragraph>
 
-const AccordianElement = ({ content, label }) => <Accordion>
-  <AccordionPanel label={label}>
+const AccordianElement = ({ content, label }) => <Box>
+    <Box overflow="scroll">
+      <Paragraph size="small">{label}</Paragraph>
+    </Box>
     <Box pad="small" background="light-2" overflow="scroll">
       <Text size="xsmall">
         {
@@ -25,8 +27,7 @@ const AccordianElement = ({ content, label }) => <Accordion>
         }
       </Text>
     </Box>
-  </AccordionPanel>
-</Accordion>
+</Box>
 
 const Container = styled(Box)`
   min-height: 100vh;
@@ -132,7 +133,7 @@ class App extends React.Component {
     const { stage, initializationError, walletAddress } = this.state
     let content
     if(stage === 'initial') {
-      content = <Button onClick={() => this.init()}>Connect To Metamask</Button>
+      content = <Button onClick={() => this.init()} label="Connect To Metamask" />
     }
     if (stage === 'web3Enabled') {
       content = <Paragraph>Initializing KeySpace</Paragraph>
@@ -152,21 +153,30 @@ class App extends React.Component {
           <Button onClick={() => this.init()}>Retry</Button>
         </>
     }
-    return <Container direction="row" fill="horizontal" pad="medium">
-      <Box width="70%">
-        {
-          stage === 'pgpPairGenerated' ?
-            <Messenger address={walletAddress} keySpace={keySpace} /> :
-            <MessengerHoldScreen />
-        }
-      </Box>
-      <Box width="30%">
-      { content }
-      { this.renderUnsignedSeed() }
-      { this.renderSignedSeed() }
-      { this.renderPGPKey() }
-      </Box>
-    </Container>;
+    return <Box>
+        <Box pad="large" border={{
+          "color": "brand",
+          "size": "small",
+          "side": "bottom"
+        }}>
+          <Text size="xlarge">KeySpace Devcon5 Demo</Text>
+        </Box>
+        <Container direction="row" fill="horizontal" pad="medium">
+        <Box width="70%">
+          {
+            stage === 'pgpPairGenerated' ?
+              <Messenger address={walletAddress} keySpace={keySpace} /> :
+              <MessengerHoldScreen />
+          }
+        </Box>
+        <Box width="30%">
+        { content }
+        { this.renderUnsignedSeed() }
+        { this.renderSignedSeed() }
+        { this.renderPGPKey() }
+        </Box>
+      </Container>
+    </Box>;
   }
 }
 

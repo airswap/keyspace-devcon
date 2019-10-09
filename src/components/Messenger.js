@@ -47,7 +47,7 @@ const Arrow = styled(Text)`
 
 const Message = ({ from, to, message, nicknames }) => <MessageContainer>
   <Box direction="row">
-  <MessageFrom size="xsmall" href={`https://rinkeby.etherscan.io/address/${from}`} primary label={nicknames[from] || from} />
+  <MessageFrom target="_blank" size="xsmall" href={`https://rinkeby.etherscan.io/address/${from}`} primary label={nicknames[from] || from} />
   {
     to ?
       <><Arrow>→</Arrow> <MessageFrom size="xsmall" href={`https://rinkeby.etherscan.io/address/${to}`} primary label={nicknames[to] || to} /></> : null

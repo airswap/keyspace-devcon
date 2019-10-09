@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components"
 import KeySpace from "../lib/keyspace";
 import { ethers } from "ethers";
-import { Heading, Paragraph, Box, Accordion, AccordionPanel, Text } from "grommet";
+import { Heading, Paragraph, Box, Accordion, AccordionPanel, Text, DropButton } from "grommet";
 import { formatErrorMessage, storeSignedSeedForAddress, getSignedSeedForAddress } from '../utils'
 import Button from './Button'
 import Messenger from './Messenger'
@@ -14,7 +14,7 @@ let keySpace;
 
 const messageToSign = "test meeeee";
 
-const MessengerHoldScreen = () => <Paragraph>Initialize Keyspace to use IPFS pubsub chat</Paragraph>
+const MessengerHoldScreen = () => <Text margin="medium">Connect a wallet and initialize Keyspace to use the IPFS pubsub chat.</Text>
 
 const AccordianElement = ({ content, label }) => <Box>
     <Box overflow="scroll">
@@ -155,7 +155,24 @@ class App extends React.Component {
       content = <Text>Sign your generated PGP key pair to authenticate it</Text>
     }
     if (stage === 'pgpPairGenerated') {
-      content = <Text>KeySpace is ready</Text>
+      content = <DropButton
+        label="KeySpace is ready"
+        dropAlign={{ top: 'bottom', right: 'right' }}
+        dropContent={
+          <Box pad="medium" margin="medium" border={{
+            "color": "brand",
+            "size": "small",
+            "side": "all"
+          }}>
+            <Box>
+              <Text size="large">KeySpace Parameters</Text>
+            </Box>
+            { this.renderUnsignedSeed() }
+            { this.renderSignedSeed() }
+            { this.renderPGPKey() }
+          </Box>
+        }
+      />
     }
     if(stage === 'keyspaceInitializationError') {
       content = <Box>
@@ -186,12 +203,6 @@ class App extends React.Component {
               <MessengerHoldScreen />
           }
         </Box>
-        {/*<Box width="30%">*/}
-        {/*{ content }*/}
-        {/*{ this.renderUnsignedSeed() }*/}
-        {/*{ this.renderSignedSeed() }*/}
-        {/*{ this.renderPGPKey() }*/}
-        {/*</Box>*/}
       </Container>
     </Box>;
   }

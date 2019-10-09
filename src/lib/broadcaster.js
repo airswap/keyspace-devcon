@@ -1,9 +1,9 @@
-const IPFS = window.Ipfs;
+import IPFS from 'ipfs'
 
 const myTopic = "QmXG8yk8UJjMT6qtE2zSxzz3U7z5jSYRgVWLCUFqAVnByM";
 
 class PubSubBroadcaster {
-  constructor(onNewMessage) {
+  constructor(onReady, onNewMessage) {
     this.node = new IPFS({
       // this is the indexDB location of the data we receive on the node
       repo: "./ipfs",
@@ -22,6 +22,7 @@ class PubSubBroadcaster {
     });
     this.node.on("ready", this._init.bind(this));
     this.onNewMessage = onNewMessage;
+    this.onReady = onReady
   }
 
   async _init() {
@@ -32,7 +33,7 @@ class PubSubBroadcaster {
 
     this.node.libp2p.on("peer:connect", this.handlePeerConnected.bind(this));
 
-    this.onready();
+    this.onReady();
   }
   handleMessageReceived(msg) {
     const messageData = msg.data.toString();

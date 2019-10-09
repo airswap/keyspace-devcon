@@ -1,30 +1,61 @@
 import React from "react";
+import styled from "styled-components"
 import KeySpace from "../lib/keyspace";
 import { ethers } from "ethers";
-import { Heading, Text, TextInput, Button } from "grommet";
+import { Heading, Paragraph, Box, Accordion, AccordionPanel, Text } from "grommet";
+import { formatErrorMessage, storeSignedSeedForAddress, getSignedSeedForAddress } from '../utils'
+import Button from './Button'
+import Messenger from './Messenger'
 
 const getSigner = () => (new ethers.providers.Web3Provider(window.ethereum).getSigner());
 
 let signer;
 let keySpace;
 
-const defaultCallback = res => {
-  debugger
-  console.log(res);
-}
-
 const messageToSign = "test meeeee";
+
+const MessengerHoldScreen = () => <Paragraph>Initialize Keyspace to use IPFS pubsub chat</Paragraph>
+
+const AccordianElement = ({ content, label }) => <Accordion>
+  <AccordionPanel label={label}>
+    <Box pad="small" background="light-2" overflow="scroll">
+      <Text size="xsmall">
+        {
+          content
+        }
+      </Text>
+    </Box>
+  </AccordionPanel>
+</Accordion>
+
+const Container = styled(Box)`
+  min-height: 100vh;
+`
 
 class App extends React.Component {
   state = {
-    stage: "initial"
+    stage: "initial",
+    unsignedSeed: "I'm generating my KeySpace PGP key encryption password"
   };
+  componentDidMount(){
+    window.web3.eth.getAccounts((err, accounts) => {
+      const [address] = accounts
+      if(address && getSignedSeedForAddress(address.toLowerCase())) {
+        this.init()
+      }
+    })
+  }
   async init() {
     await window.ethereum.enable();
     this.setState({ stage: 'web3Enabled' })
     signer = getSigner()
+    const walletAddress = (await signer.getAddress()).toLowerCase();
+    this.setState({ walletAddress })
+    const signedSeed = getSignedSeedForAddress(walletAddress);
     keySpace = new KeySpace({
       signer,
+      signedSeed,
+      seed: this.state.unsignedSeed,
       onRequestSignedSeed: (unsignedSeed) => {
         this.setState({
           unsignedSeed,
@@ -32,58 +63,110 @@ class App extends React.Component {
         })
       },
       onGeneratedSignedSeed: (signedSeed) => {
+        storeSignedSeedForAddress({ signedSeed, address: walletAddress });
         this.setState({
           signedSeed,
           stage: 'seedSigned'
         })
       },
       onRequestPGPKeyPair: (pgpKeyPairAccount) => {
-        debugger
         this.setState({
           stage: 'waitingPGPPairSignature'
         })
       },
       onGeneratedPGPKeyPair: (pgpKey) => {
-        debugger
         this.setState({
-          stage: 'pgpPairGenerated'
+          stage: 'pgpPairGenerated',
+          pgpKey,
         })
       },
     });
-    const walletAddress = (await signer.getAddress()).toLowerCase();
-    await keySpace.setUpPGP();
-    // console.log(messageToSign);
-    const signedMessage = await keySpace.sign(messageToSign);
-    console.log("signedMessage", signedMessage);
-    const validated = await keySpace.validate(signedMessage, walletAddress);
-    console.log("validated", validated);
-    const encryptedMessage = await keySpace.encrypt(
-      messageToSign,
-      walletAddress
-    );
-    console.log("encryptedMessage", encryptedMessage);
-    const decryptedMessage = await keySpace.decrypt(
-      encryptedMessage,
-      walletAddress
-    );
-    console.log("decryptedMessage", decryptedMessage);
-
-    return;
+    try {
+      await keySpace.setUpPGP();
+    } catch (initializationError) {
+      this.setState({
+        stage: 'keyspaceInitializationError',
+        initializationError
+      })
+      return
+    }
+  }
+  renderUnsignedSeed(){
+    const { unsignedSeed } = this.state
+    if(!unsignedSeed) {
+      return null
+    } else {
+      return <AccordianElement label="Unsigned Seed" content={unsignedSeed} />
+    }
+  }
+  renderSignedSeed(){
+    const { signedSeed } = this.state
+    if(!signedSeed) {
+      return null
+    } else {
+      return <AccordianElement label="Signed Seed (PGP key encryption password)" content={signedSeed} />
+    }
+  }
+  renderPGPKey(){
+    const { pgpKey } = this.state
+    if(!pgpKey) {
+      return null
+    } else {
+      return <>
+        <AccordianElement label="PGP Public Key" content={ pgpKey.public
+          .split('\\r\\n')
+          .map((item, key) => {
+            return <span key={key}>{item}<br/></span>
+          })
+        } />
+        <AccordianElement label="PGP Private Key" content={ pgpKey.private
+          .split('\\r\\n')
+          .map((item, key) => {
+            return <span key={key}>{item}<br/></span>
+          })
+        } />
+      </>
+    }
   }
   render() {
-    const { stage } = this.state
+    const { stage, initializationError, walletAddress } = this.state
     let content
     if(stage === 'initial') {
       content = <Button onClick={() => this.init()}>Connect To Metamask</Button>
     }
     if (stage === 'web3Enabled') {
-      content = <Text>Initializing KeySpace, Sign to create your seed</Text>
+      content = <Paragraph>Initializing KeySpace</Paragraph>
     }
-
-    return <div>
-      <Heading>{stage}</Heading>
+    if (stage === 'waitingForSeedSignature') {
+      content = <Paragraph>Initializing KeySpace, Sign to create your seed</Paragraph>
+    }
+    if (stage === 'waitingPGPPairSignature') {
+      content = <Paragraph>Sign your generated PGP key pair to authenticate it</Paragraph>
+    }
+    if (stage === 'pgpPairGenerated') {
+      content = <Paragraph>KeySpace is ready</Paragraph>
+    }
+    if(stage === 'keyspaceInitializationError') {
+      content = <>
+          <Paragraph>{`Keyspace Initialization Error: ${formatErrorMessage(initializationError)}`}</Paragraph>
+          <Button onClick={() => this.init()}>Retry</Button>
+        </>
+    }
+    return <Container direction="row" fill="horizontal" pad="medium">
+      <Box width="70%">
+        {
+          stage === 'pgpPairGenerated' ?
+            <Messenger address={walletAddress} keySpace={keySpace} /> :
+            <MessengerHoldScreen />
+        }
+      </Box>
+      <Box width="30%">
       { content }
-    </div>;
+      { this.renderUnsignedSeed() }
+      { this.renderSignedSeed() }
+      { this.renderPGPKey() }
+      </Box>
+    </Container>;
   }
 }
 

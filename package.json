@@ -7,6 +7,7 @@
     "axios": "^0.19.0",
     "ethers": "^4.0.37",
     "grommet": "^2.7.9",
+    "ipfs": "^0.38.0",
     "ipfs-mini": "^1.1.5",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.15",
@@ -20,7 +21,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && mv build docs",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

@@ -20,10 +20,7 @@ class App extends React.Component {
   render() {
     return (
       <Grommet full={true} theme={myTheme}>
-        <div className="App">
-          {/* <Messenger /> */}
-          <KeyspaceFlow />
-        </div>
+        <KeyspaceFlow />
       </Grommet>
     );
   }

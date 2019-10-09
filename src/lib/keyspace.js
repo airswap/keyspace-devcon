@@ -134,6 +134,8 @@ class KeySpace {
   async setUpPGP() {
     await this.initialized;
     if (this.isPGPReady()) {
+      this.onGeneratedSignedSeed(this.signedSeed)
+      this.onGeneratedPGPKeyPair(this.signerPGPKey)
       return true;
     }
     if (!this.signedSeed) {
@@ -146,6 +148,8 @@ class KeySpace {
       } catch (e) {
         return Promise.reject(e);
       }
+    } else {
+      this.onGeneratedSignedSeed(this.signedSeed)
     }
     if (!this.signerPGPKey) {
       // generating key pair
@@ -162,7 +166,7 @@ class KeySpace {
       try {
         ipfsKeyHash = ipfsHash(await ipfsStoreJSON(keyPair));
       } catch (e) {
-        return Promise.reject(e);
+        return Promise.reject('Could not connect to IPFS');
       }
 
       const signatureText = keyspaceSignatureTextFn(ipfsKeyHash);
@@ -221,7 +225,6 @@ class KeySpace {
     });
   }
   async decrypt(encryptedMessage, fromAddress) {
-    await this.setUpPGP();
     const fromKey = await this.fetchKeyByAddress(fromAddress.toLowerCase());
     const publicKeyArmored = fromKey.public;
     const [privKeyObj] = (await openpgp.key.readArmored(

@@ -32,6 +32,16 @@ const AccordianElement = ({ content, label }) => <Box>
 const Container = styled(Box)`
   min-height: 100vh;
 `
+const AuthButton = styled(Button)`
+  //background: #2b71ff;
+  display: inline-block;
+  //color: white;
+  padding: 10px;
+  border-radius: 40px;
+  width: auto;
+  text-align: center;
+`;
+
 
 class App extends React.Component {
   state = {
@@ -133,48 +143,55 @@ class App extends React.Component {
     const { stage, initializationError, walletAddress } = this.state
     let content
     if(stage === 'initial') {
-      content = <Button onClick={() => this.init()} label="Connect To Metamask" />
+      content = <AuthButton onClick={() => this.init()} label="Connect To Metamask" />
     }
     if (stage === 'web3Enabled') {
-      content = <Paragraph>Initializing KeySpace</Paragraph>
+      content = <Text>Initializing KeySpace</Text>
     }
     if (stage === 'waitingForSeedSignature') {
-      content = <Paragraph>Initializing KeySpace, Sign to create your seed</Paragraph>
+      content = <Text>Initializing KeySpace, Sign to create your seed</Text>
     }
     if (stage === 'waitingPGPPairSignature') {
-      content = <Paragraph>Sign your generated PGP key pair to authenticate it</Paragraph>
+      content = <Text>Sign your generated PGP key pair to authenticate it</Text>
     }
     if (stage === 'pgpPairGenerated') {
-      content = <Paragraph>KeySpace is ready</Paragraph>
+      content = <Text>KeySpace is ready</Text>
     }
     if(stage === 'keyspaceInitializationError') {
-      content = <>
-          <Paragraph>{`Keyspace Initialization Error: ${formatErrorMessage(initializationError)}`}</Paragraph>
-          <Button onClick={() => this.init()}>Retry</Button>
-        </>
+      content = <Box>
+          <Text>{`Keyspace Initialization Error: ${formatErrorMessage(initializationError)}`}</Text>
+          <AuthButton onClick={() => this.init()} label="Retry" />
+        </Box>
     }
     return <Box>
-        <Box pad="large" border={{
+        <Box pad="large" direction="row" alignContent="stretch" border={{
           "color": "brand",
           "size": "small",
           "side": "bottom"
         }}>
-          <Text size="xlarge">KeySpace Devcon5 Demo</Text>
+          <Box flex={{ grow: 1 }} direction="row">
+            <Text size="xlarge">KeySpace Devcon5 Demo</Text>
+          </Box>
+          <Box direction="row">
+            {
+              content
+            }
+          </Box>
         </Box>
         <Container direction="row" fill="horizontal" pad="medium">
-        <Box width="70%">
+        <Box width="100%">
           {
             stage === 'pgpPairGenerated' ?
               <Messenger address={walletAddress} keySpace={keySpace} /> :
               <MessengerHoldScreen />
           }
         </Box>
-        <Box width="30%">
-        { content }
-        { this.renderUnsignedSeed() }
-        { this.renderSignedSeed() }
-        { this.renderPGPKey() }
-        </Box>
+        {/*<Box width="30%">*/}
+        {/*{ content }*/}
+        {/*{ this.renderUnsignedSeed() }*/}
+        {/*{ this.renderSignedSeed() }*/}
+        {/*{ this.renderPGPKey() }*/}
+        {/*</Box>*/}
       </Container>
     </Box>;
   }

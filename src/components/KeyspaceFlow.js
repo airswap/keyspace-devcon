@@ -155,7 +155,7 @@ class App extends React.Component {
             return <span key={key}>{item}<br/></span>
           })
         } />
-        <AccordianElement label="PGP Private Key" content={ pgpKey.private
+        <AccordianElement label="Encrypted PGP Private Key" content={ pgpKey.private
           .split('\\r\\n')
           .map((item, key) => {
             return <span key={key}>{item}<br/></span>

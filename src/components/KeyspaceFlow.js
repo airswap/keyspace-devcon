@@ -6,6 +6,8 @@ import { Heading, Paragraph, Box, Accordion, AccordionPanel, Text, DropButton } 
 import { formatErrorMessage, storeSignedSeedForAddress, getSignedSeedForAddress } from '../utils'
 import Button from './Button'
 import Messenger from './Messenger'
+import mobile from 'is-mobile'
+
 
 const getSigner = () => (new ethers.providers.Web3Provider(window.ethereum).getSigner());
 
@@ -13,8 +15,6 @@ let signer;
 let keySpace;
 
 const messageToSign = "test meeeee";
-
-const MessengerHoldScreen = () => <Text margin="medium">Connect a wallet and initialize Keyspace to use the IPFS pubsub chat.</Text>
 
 const AccordianElement = ({ content, label }) => <Box>
     <Box overflow="scroll">
@@ -155,10 +155,11 @@ class App extends React.Component {
   }
   render() {
     const { stage, initializationError, walletAddress } = this.state
-    let content
+    let content = null
+    let headerContent = null
     if(stage === 'initial') {
       content = <Box direction="row">
-        <AuthButton margin="small" onClick={() => this.init('newWallet')} label="Generate New Wallet" />
+        <AuthButton margin="small" onClick={() => this.init('newWallet')} label="Generate Temporary Wallet" />
 
         <AuthButton margin="small" onClick={() => this.init('metamask')} label="Connect To Metamask" />
       </Box>
@@ -172,8 +173,8 @@ class App extends React.Component {
     if (stage === 'waitingPGPPairSignature') {
       content = <Text>Sign your generated PGP key pair to authenticate it</Text>
     }
-    if (stage === 'pgpPairGenerated') {
-      content = <DropButton
+    if (stage === 'pgpPairGenerated' && !mobile()) {
+      headerContent = <DropButton
         label="KeySpace is ready"
         dropAlign={{ top: 'bottom', right: 'right' }}
         dropContent={
@@ -205,11 +206,11 @@ class App extends React.Component {
           "side": "bottom"
         }}>
           <Box flex={{ grow: 1 }} direction="row">
-            <Text size="xlarge">KeySpace Devcon5 Demo</Text>
+            <Text size={ mobile() ? 'medium' :  'xlarge' }>KeySpace Devcon5 Demo</Text>
           </Box>
           <Box direction="row">
             {
-              content
+              headerContent
             }
           </Box>
         </Box>
@@ -218,7 +219,14 @@ class App extends React.Component {
           {
             stage === 'pgpPairGenerated' ?
               <Messenger address={walletAddress} keySpace={keySpace} /> :
-              <MessengerHoldScreen />
+              <Box align="center">
+                <Box margin="medium">
+                  <Text>Connect a wallet and initialize Keyspace to use the IPFS pubsub chat.</Text>
+                </Box>
+                <Box margin="medium">
+                  { content }
+                </Box>
+              </Box>
           }
         </Box>
       </Container>

@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import styled from 'styled-components'
 import React from "react";
+import mobile from 'is-mobile'
 import { Heading, Text, Paragraph, TextInput, Tabs, Tab, Box, Anchor, Accordion, AccordionPanel, CheckBox } from "grommet";
 import Broadcaster from "../lib/broadcaster";
 import Button from './Button'
@@ -93,7 +94,8 @@ class Messenger extends React.Component {
     messages: [],
     myMessages: [],
     newMessage: ``,
-    nicknames: {}
+    nicknames: {},
+    discoveryMessages: []
   };
   componentWillUnmount() {
     debugger
@@ -128,6 +130,7 @@ class Messenger extends React.Component {
         const message = JSON.parse(msg)
         if(message.type === 'requestIntroductions') {
           this.broadcaster.sendMessage(makeIntroduction({ from: address, nickname: this.state.nicknames[address] }))
+          this.setState({ discoveryMessages: [...this.state.discoveryMessages, message] });
           return
         } else if(message.type === 'introduction') {
           this.addIntroduction(message.from)
@@ -139,6 +142,7 @@ class Messenger extends React.Component {
               }
             })
           }
+          this.setState({ discoveryMessages: [...this.state.discoveryMessages, message] });
           return
         } else if(message.type === 'message' && message.to === address) {
           this.decryptMessage(message)
@@ -201,24 +205,25 @@ class Messenger extends React.Component {
     }
   }
   renderMessages() {
-    const { messages, myMessages, nicknames } = this.state;
+    const { messages, myMessages, discoveryMessages, nicknames } = this.state;
 
     return <MessagesContainer fill="horizontal" flex={{ grow: 1 }}>
       <Tabs>
-      <Tab title="My Decrypted Chat">
+      <Tab title={ mobile() ? `Chat (${myMessages.length})` : `My Decrypted Chat (${myMessages.length})` }>
         <MessageBox pad="medium" overflow="scroll">
           {myMessages.map(({ from, message }) => <Message {...{ from, message }} nicknames={nicknames} />)}
         </MessageBox>
       </Tab>
-      <Tab title="Encrypted PubSub Stream">
+      <Tab title={ mobile() ? `PubSub (${messages.length})` : `Encrypted PubSub Stream (${messages.length})` }>
         <MessageBox pad="medium" overflow="scroll">
            {messages.map(({ from, to, message }) => <Message {...{ from, to, message }} nicknames={nicknames} />)}
         </MessageBox>
       </Tab>
-      {/*<Tab title="Discovery Protocol">*/}
-      {/*  <Box pad="medium" overflow="scroll">*/}
-      {/*  </Box>*/}
-      {/*</Tab>*/}
+      <Tab title={ mobile() ? `Peer (${discoveryMessages.length})` : `Peer Discovery Protocol (${discoveryMessages.length})` }>
+        <MessageBox pad="medium" overflow="scroll">
+          {[...discoveryMessages].reverse().slice(0, 20).map(({ from, to, type, nickname }) => <Message {...{ from, to, message: `${type}${ nickname ? `, nickname: ${nickname}` : ''}` }} nicknames={nicknames} />)}
+        </MessageBox>
+      </Tab>
     </Tabs>
     </MessagesContainer>
   }
@@ -230,7 +235,8 @@ class Messenger extends React.Component {
   renderPeers(){
     const { address } = this.props
     const { peers, selectedPeers, nicknames } = this.state
-    const label = `Known Peers (${peers.length}) Selected Peers (${selectedPeers.length})`
+    const label = mobile() ? `Peers (${peers.length}) Selected (${selectedPeers.length})` :
+      `Known Peers (${peers.length}) Selected Peers (${selectedPeers.length})`
 
     return <Accordion>
       <AccordionPanel label={label}>
@@ -267,6 +273,11 @@ class Messenger extends React.Component {
                 newMessage: event.target.value
               })
             }
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                this.sendMessage();
+              }
+            }}
 
           />
           <br/>

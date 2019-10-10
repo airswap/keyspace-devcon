@@ -9,6 +9,7 @@
     "grommet": "^2.7.9",
     "ipfs": "^0.38.0",
     "ipfs-mini": "^1.1.5",
+    "is-mobile": "^2.1.0",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.15",
     "openpgp": "^4.0.2",

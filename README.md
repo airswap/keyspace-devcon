@@ -10,7 +10,7 @@ This demo is a react application that allows you to set up keyspace with metamas
 
 [Live application hosted on github pages](https://airswap.github.io/keyspace-devcon/)
 
-[The presentation associated with demo](https://docs.google.com/presentation/d/1wE0pxwzEWiMv8acmneI9TezVJPc38QAx6uabMHVarFY/edit#slide=id.g61ae1a3fee_0_85)
+[The presentation associated with demo](https://docs.google.com/presentation/d/1wE0pxwzEWiMv8acmneI9TezVJPc38QAx6uabMHVarFY/)
 
 [Home of KeySpace in AirSwap.js](https://github.com/airswap/AirSwap.js/tree/develop/src/keySpace)
 

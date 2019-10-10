@@ -211,17 +211,17 @@ class Messenger extends React.Component {
       <Tabs>
       <Tab title={ mobile() ? `Chat (${myMessages.length})` : `My Decrypted Chat (${myMessages.length})` }>
         <MessageBox pad="medium" overflow="scroll">
-          {myMessages.map(({ from, message }) => <Message {...{ from, message }} nicknames={nicknames} />)}
+          {[...myMessages].reverse().map(({ from, message }) => <Message {...{ from, message }} nicknames={nicknames} />)}
         </MessageBox>
       </Tab>
       <Tab title={ mobile() ? `PubSub (${messages.length})` : `Encrypted PubSub Stream (${messages.length})` }>
         <MessageBox pad="medium" overflow="scroll">
-           {messages.map(({ from, to, message }) => <Message {...{ from, to, message }} nicknames={nicknames} />)}
+           {[...messages].reverse().map(({ from, to, message }) => <Message {...{ from, to, message }} nicknames={nicknames} />)}
         </MessageBox>
       </Tab>
       <Tab title={ mobile() ? `Peer (${discoveryMessages.length})` : `Peer Discovery Protocol (${discoveryMessages.length})` }>
         <MessageBox pad="medium" overflow="scroll">
-          {[...discoveryMessages].reverse().slice(0, 20).reverse().map(({ from, to, type, nickname }) => <Message {...{ from, to, message: `${type}${ nickname ? `, nickname: ${nickname}` : ''}` }} nicknames={nicknames} />)}
+          {[...discoveryMessages].reverse().slice(0, 20).map(({ from, to, type, nickname }) => <Message {...{ from, to, message: `${type}${ nickname ? `, nickname: ${nickname}` : ''}` }} nicknames={nicknames} />)}
         </MessageBox>
       </Tab>
     </Tabs>

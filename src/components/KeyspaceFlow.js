@@ -42,6 +42,16 @@ const AuthButton = styled(Button)`
   text-align: center;
 `;
 
+const AboutButton = styled(AuthButton)`
+  position: absolute; 
+  right: 0;
+  padding: 4px 10px;
+  top: ${ mobile() ? '-15px' : '-12px'};
+`
+
+const HeaderRightBox = styled(Box)`
+position: relative;
+`
 
 class App extends React.Component {
   state = {
@@ -208,11 +218,12 @@ class App extends React.Component {
           <Box flex={{ grow: 1 }} direction="row">
             <Text size={ mobile() ? 'medium' :  'xlarge' }>KeySpace Devcon5 Demo</Text>
           </Box>
-          <Box direction="row">
+          <HeaderRightBox pad={{ right: 'large' }} direction="row">
             {
               headerContent
             }
-          </Box>
+            <AboutButton margin="small" onClick={() => window.open('https://github.com/airswap/keyspace-devcon', '_blank')} label="?" />
+          </HeaderRightBox>
         </Box>
         <Container direction="row" fill="horizontal" pad="medium">
         <Box width="100%">

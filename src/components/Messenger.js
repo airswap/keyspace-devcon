@@ -221,7 +221,7 @@ class Messenger extends React.Component {
       </Tab>
       <Tab title={ mobile() ? `Peer (${discoveryMessages.length})` : `Peer Discovery Protocol (${discoveryMessages.length})` }>
         <MessageBox pad="medium" overflow="scroll">
-          {[...discoveryMessages].reverse().slice(0, 20).map(({ from, to, type, nickname }) => <Message {...{ from, to, message: `${type}${ nickname ? `, nickname: ${nickname}` : ''}` }} nicknames={nicknames} />)}
+          {[...discoveryMessages].reverse().slice(0, 20).reverse().map(({ from, to, type, nickname }) => <Message {...{ from, to, message: `${type}${ nickname ? `, nickname: ${nickname}` : ''}` }} nicknames={nicknames} />)}
         </MessageBox>
       </Tab>
     </Tabs>

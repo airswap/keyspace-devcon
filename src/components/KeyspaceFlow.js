@@ -50,7 +50,8 @@ const AboutButton = styled(AuthButton)`
 `
 
 const HeaderRightBox = styled(Box)`
-position: relative;
+  position: relative;
+  padding-right: 50px
 `
 
 class App extends React.Component {
@@ -181,7 +182,7 @@ class App extends React.Component {
       content = <Text>Initializing KeySpace, Sign to create your seed</Text>
     }
     if (stage === 'waitingPGPPairSignature') {
-      content = <Text>Sign your generated PGP key pair to authenticate it</Text>
+      content = <Text>Signing your generated PGP key pair to authenticate it</Text>
     }
     if (stage === 'pgpPairGenerated' && !mobile()) {
       headerContent = <DropButton
@@ -218,7 +219,7 @@ class App extends React.Component {
           <Box flex={{ grow: 1 }} direction="row">
             <Text size={ mobile() ? 'medium' :  'xlarge' }>KeySpace Devcon5 Demo</Text>
           </Box>
-          <HeaderRightBox pad={{ right: 'large' }} direction="row">
+          <HeaderRightBox direction="row">
             {
               headerContent
             }

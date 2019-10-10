@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "549babb493c3aa5ecf68abae41e45256",
+    "revision": "d50c856bf1579a27536823f5af910d56",
     "url": "/keyspace-devcon/index.html"
   },
   {
@@ -8,8 +8,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/keyspace-devcon/static/js/2.3daa0796.chunk.js"
   },
   {
-    "revision": "ff3c18820d005cf319ea",
-    "url": "/keyspace-devcon/static/js/main.315dcece.chunk.js"
+    "revision": "76849fdebaaf99227b2b",
+    "url": "/keyspace-devcon/static/js/main.67dff4d5.chunk.js"
   },
   {
     "revision": "c55cd8acd7befd84793a",
